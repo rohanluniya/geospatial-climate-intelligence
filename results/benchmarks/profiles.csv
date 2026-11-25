@@ -1,0 +1,4 @@
+profile,raster_px,dask_chunk,validated_scenes,total_band_pixels,generate_sources_ms,stac_bronze_ms,crs_reprojection_ms,cube_zonal_anomaly_ms,dq_ms,total_duration_ms,band_pixels_per_sec,scenes_per_sec,dq_passed,dq_total
+smoke,64x64,32,22,540672,74.31,121.85,157.23,76.81,6.22,515.82,1048179.6,42.65,8,8
+local,128x128,64,22,2162688,206.79,51.21,328.49,117.34,7.49,742.6,2912318.9,29.63,8,8
+stress,256x256,64,22,8650752,740.99,56.22,1019.54,302.3,6.03,2154.65,4014922.1,10.21,8,8

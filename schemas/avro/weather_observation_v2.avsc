@@ -1,0 +1,23 @@
+{
+  "type": "record",
+  "name": "WeatherObservation",
+  "namespace": "io.geoclimate.events",
+  "doc": "Backward-compatible schema v2 adding sensor calibration version and QA quality flag with defaults.",
+  "fields": [
+    {"name": "observation_id", "type": "string", "doc": "Deterministic SHA-256 based observation key"},
+    {"name": "station_id", "type": "string"},
+    {"name": "region_id", "type": "string"},
+    {"name": "basin_id", "type": "string"},
+    {"name": "event_time_utc", "type": "string", "doc": "ISO-8601 observation timestamp"},
+    {"name": "ingest_time_utc", "type": "string", "doc": "ISO-8601 processing ingestion timestamp"},
+    {"name": "latitude", "type": "double"},
+    {"name": "longitude", "type": "double"},
+    {"name": "air_temp_c", "type": ["null", "double"], "default": null},
+    {"name": "precip_mm", "type": ["null", "double"], "default": null},
+    {"name": "humidity_pct", "type": ["null", "double"], "default": null},
+    {"name": "event_type", "type": {"type": "enum", "name": "ObservationEventType", "symbols": ["MEASUREMENT", "CORRECTION", "RETRACTION"]}, "default": "MEASUREMENT"},
+    {"name": "source_license", "type": "string", "default": "CC-BY-4.0"},
+    {"name": "sensor_calibration_version", "type": "string", "default": "v1.0-legacy"},
+    {"name": "quality_flag", "type": "string", "default": "UNVERIFIED"}
+  ]
+}

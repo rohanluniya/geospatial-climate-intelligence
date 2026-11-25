@@ -1,0 +1,22 @@
+{
+  "type": "record",
+  "name": "StacIngestEvent",
+  "namespace": "io.geoclimate.events",
+  "doc": "Contract for satellite STAC asset ingestion and provenance tracking.",
+  "fields": [
+    {"name": "scene_id", "type": "string"},
+    {"name": "collection_id", "type": "string"},
+    {"name": "region_id", "type": "string"},
+    {"name": "acquisition_time_utc", "type": "string"},
+    {"name": "ingest_time_utc", "type": "string"},
+    {"name": "epsg_code", "type": "int"},
+    {"name": "cloud_cover_pct", "type": "double"},
+    {"name": "asset_uri", "type": "string"},
+    {"name": "sha256_expected", "type": "string"},
+    {"name": "sha256_actual", "type": "string"},
+    {"name": "scene_version", "type": "int", "default": 1},
+    {"name": "license", "type": "string", "default": "CC-BY-4.0"},
+    {"name": "antimeridian_crossing", "type": "boolean", "default": false},
+    {"name": "polar_region", "type": "boolean", "default": false}
+  ]
+}

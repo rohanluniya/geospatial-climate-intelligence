@@ -1,0 +1,58 @@
+# Multi-stage standalone image for Geospatial & Climate Intelligence Engine
+# Pinned base image (Debian Bookworm + Python 3.12.8) supporting linux/arm64 and linux/amd64.
+
+FROM python:3.12.8-slim-bookworm AS builder
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY pyproject.toml README.md LICENSE ./
+COPY geo_climate ./geo_climate
+COPY ingestion ./ingestion
+COPY processing ./processing
+COPY models ./models
+COPY services ./services
+COPY schemas ./schemas
+COPY apps ./apps
+
+RUN python -m venv /opt/venv \
+    && /opt/venv/bin/pip install --upgrade "pip==25.0.1" \
+    && /opt/venv/bin/pip install .
+
+FROM python:3.12.8-slim-bookworm AS runtime
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    GEO_CLIMATE_DATA_DIR=/var/lib/geoclimate \
+    GEO_CLIMATE_API_HOST=0.0.0.0 \
+    GEO_CLIMATE_API_PORT=8070
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --shell /bin/bash geoclimate
+
+WORKDIR /app
+COPY --from=builder /opt/venv /opt/venv
+COPY --from=builder /app /app
+COPY scripts/entrypoint_standalone.sh /usr/local/bin/entrypoint_standalone.sh
+RUN chmod +x /usr/local/bin/entrypoint_standalone.sh \
+    && mkdir -p /var/lib/geoclimate \
+    && chown -R geoclimate:geoclimate /var/lib/geoclimate /app
+
+USER geoclimate
+EXPOSE 8070
+
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:8070/health || exit 1
+
+ENTRYPOINT ["/usr/local/bin/entrypoint_standalone.sh"]

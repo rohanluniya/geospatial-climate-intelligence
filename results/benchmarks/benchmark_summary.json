@@ -1,0 +1,130 @@
+{
+  "generated_at_utc": "2026-11-25T06:04:12.968352+00:00",
+  "hardware": {
+    "os": "Darwin 24.6.0",
+    "arch": "arm64",
+    "cpu_count": 14,
+    "python_version": "3.12.8"
+  },
+  "profiles": [
+    {
+      "profile": "smoke",
+      "raster_px": "64x64",
+      "dask_chunk": 32,
+      "validated_scenes": 22,
+      "total_band_pixels": 540672,
+      "generate_sources_ms": 74.31,
+      "stac_bronze_ms": 121.85,
+      "crs_reprojection_ms": 157.23,
+      "cube_zonal_anomaly_ms": 76.81,
+      "dq_ms": 6.22,
+      "total_duration_ms": 515.82,
+      "band_pixels_per_sec": 1048179.6,
+      "scenes_per_sec": 42.65,
+      "dq_passed": 8,
+      "dq_total": 8
+    },
+    {
+      "profile": "local",
+      "raster_px": "128x128",
+      "dask_chunk": 64,
+      "validated_scenes": 22,
+      "total_band_pixels": 2162688,
+      "generate_sources_ms": 206.79,
+      "stac_bronze_ms": 51.21,
+      "crs_reprojection_ms": 328.49,
+      "cube_zonal_anomaly_ms": 117.34,
+      "dq_ms": 7.49,
+      "total_duration_ms": 742.6,
+      "band_pixels_per_sec": 2912318.9,
+      "scenes_per_sec": 29.63,
+      "dq_passed": 8,
+      "dq_total": 8
+    },
+    {
+      "profile": "stress",
+      "raster_px": "256x256",
+      "dask_chunk": 64,
+      "validated_scenes": 22,
+      "total_band_pixels": 8650752,
+      "generate_sources_ms": 740.99,
+      "stac_bronze_ms": 56.22,
+      "crs_reprojection_ms": 1019.54,
+      "cube_zonal_anomaly_ms": 302.3,
+      "dq_ms": 6.03,
+      "total_duration_ms": 2154.65,
+      "band_pixels_per_sec": 4014922.1,
+      "scenes_per_sec": 10.21,
+      "dq_passed": 8,
+      "dq_total": 8
+    }
+  ],
+  "dask_chunk_ablation": [
+    {
+      "chunk_size": 16,
+      "dask_partitions": 1536,
+      "median_ms": 184.906,
+      "p95_ms": 212.0878,
+      "mean_ndvi_check": 0.705089,
+      "parity_delta_vs_baseline": 0.0
+    },
+    {
+      "chunk_size": 32,
+      "dask_partitions": 384,
+      "median_ms": 66.973,
+      "p95_ms": 93.8877,
+      "mean_ndvi_check": 0.705089,
+      "parity_delta_vs_baseline": 0.0
+    },
+    {
+      "chunk_size": 64,
+      "dask_partitions": 96,
+      "median_ms": 46.832,
+      "p95_ms": 47.2597,
+      "mean_ndvi_check": 0.705089,
+      "parity_delta_vs_baseline": 0.0
+    },
+    {
+      "chunk_size": 128,
+      "dask_partitions": 24,
+      "median_ms": 42.936,
+      "p95_ms": 43.2889,
+      "mean_ndvi_check": 0.705089,
+      "parity_delta_vs_baseline": 0.0
+    },
+    {
+      "chunk_size": 256,
+      "dask_partitions": 6,
+      "median_ms": 40.839,
+      "p95_ms": 41.9231,
+      "mean_ndvi_check": 0.705089,
+      "parity_delta_vs_baseline": 0.0
+    }
+  ],
+  "tile_cache": {
+    "cold_samples": 32,
+    "cold_p50_ms": 37.6032,
+    "cold_p95_ms": 53.4025,
+    "cold_p99_ms": 53.8163,
+    "disk_warm_p50_ms": 0.1793,
+    "disk_warm_p95_ms": 0.2251,
+    "mem_warm_samples": 64,
+    "mem_warm_p50_ms": 0.0038,
+    "mem_warm_p95_ms": 0.0041,
+    "mem_warm_p99_ms": 0.0057,
+    "disk_speedup_vs_cold_x": 209.7,
+    "mem_speedup_vs_cold_x": 9895.6
+  },
+  "iceberg_compaction": {
+    "table": "gold.zonal_climate_stats",
+    "rows_preserved": 354,
+    "files_before": 25,
+    "files_after": 1,
+    "compaction_duration_ms": 86.403,
+    "scan_p50_before_ms": 29.4186,
+    "scan_p95_before_ms": 30.1008,
+    "scan_p50_after_ms": 3.154,
+    "scan_p95_after_ms": 3.5066,
+    "scan_speedup_x": 9.33
+  }
+}

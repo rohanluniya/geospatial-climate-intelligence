@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geo-climate-api
+  namespace: geospatial-climate
+  labels:
+    app: geo-climate-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: geo-climate-api
+  template:
+    metadata:
+      labels:
+        app: geo-climate-api
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: geo-api
+          image: geospatial-climate-intelligence:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8070
+              name: http
+          env:
+            - name: GEO_CLIMATE_API_HOST
+              value: "0.0.0.0"
+            - name: GEO_CLIMATE_API_PORT
+              value: "8070"
+            - name: GEO_CLIMATE_VIEWER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: geoclimate-api-tokens
+                  key: viewer-token
+            - name: GEO_CLIMATE_ADMIN_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: geoclimate-api-tokens
+                  key: admin-token
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8070
+            initialDelaySeconds: 10
+            periodSeconds: 15
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8070
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "1Gi"
+            limits:
+              cpu: "2000m"
+              memory: "4Gi"
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop: ["ALL"]

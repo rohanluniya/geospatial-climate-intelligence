@@ -1,0 +1,38 @@
+groups:
+  - name: geospatial_climate_slos
+    rules:
+      - alert: GeospatialDataQualityCheckFailed
+        expr: geoclimate_dq_checks_status == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Geospatial DQ gate failed ({{ $labels.check }})"
+          description: "Data quality check {{ $labels.check }} in layer {{ $labels.layer }} returned FAIL (0)."
+
+      - alert: QuarantineDLQSpike
+        expr: increase(geoclimate_quarantined_records_total[15m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Spike in quarantined geospatial/weather records"
+          description: "More than 10 corrupt GeoTIFF or invalid weather records quarantined in 15m."
+
+      - alert: TileRenderLatencyHigh
+        expr: (geoclimate_tile_render_duration_ms_sum / clamp_min(geoclimate_tile_render_duration_ms_count, 1)) > 250
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Average PNG map tile render latency exceeded 250 ms"
+          description: "Investigate cache invalidation storms or GDAL/COG I/O bottlenecks."
+
+      - alert: UnauthorizedAccessBurst
+        expr: increase(geoclimate_auth_rejections_total[5m]) > 20
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Elevated unauthorized/forbidden API access attempts"
+          description: "Review security_audit.jsonl for invalid token or privilege-escalation attempts."

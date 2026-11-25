@@ -1,0 +1,137 @@
+{
+  "generated_at_utc": "2026-11-25T06:06:39.763104+00:00",
+  "project_license": "Apache-2.0",
+  "pretrained_weights_downloaded": 0,
+  "packages_audited": 18,
+  "flagged_packages": [],
+  "packages": [
+    {
+      "package": "rasterio",
+      "version": "1.5.2",
+      "license": "BSD-3-Clause",
+      "status": "PASS"
+    },
+    {
+      "package": "shapely",
+      "version": "2.2.0",
+      "license": "BSD-3-Clause",
+      "status": "PASS"
+    },
+    {
+      "package": "pyproj",
+      "version": "3.8.0",
+      "license": "MIT",
+      "status": "PASS"
+    },
+    {
+      "package": "xarray",
+      "version": "2026.9.0",
+      "license": "Apache-2.0",
+      "status": "PASS"
+    },
+    {
+      "package": "dask",
+      "version": "2026.8.0",
+      "license": "BSD-3-Clause",
+      "status": "PASS"
+    },
+    {
+      "package": "pystac",
+      "version": "1.16.0",
+      "license": "Apache-2.0",
+      "status": "PASS"
+    },
+    {
+      "package": "pyiceberg",
+      "version": "0.12.0",
+      "license": "Apache-2.0",
+      "status": "PASS"
+    },
+    {
+      "package": "duckdb",
+      "version": "2.0.0",
+      "license": "MIT License",
+      "status": "PASS"
+    },
+    {
+      "package": "pyarrow",
+      "version": "25.0.1",
+      "license": "Apache-2.0",
+      "status": "PASS"
+    },
+    {
+      "package": "fastavro",
+      "version": "1.13.1",
+      "license": "MIT",
+      "status": "PASS"
+    },
+    {
+      "package": "fastapi",
+      "version": "0.163.2",
+      "license": "MIT",
+      "status": "PASS"
+    },
+    {
+      "package": "uvicorn",
+      "version": "0.54.0",
+      "license": "BSD-3-Clause",
+      "status": "PASS"
+    },
+    {
+      "package": "pillow",
+      "version": "13.0.0",
+      "license": "MIT-CMU",
+      "status": "PASS"
+    },
+    {
+      "package": "numpy",
+      "version": "2.5.5",
+      "license": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0",
+      "status": "PASS"
+    },
+    {
+      "package": "scipy",
+      "version": "1.18.1",
+      "license": "Copyright (c) 2001-2002 Enthought, Inc. 2003, SciPy Developers.",
+      "status": "PASS"
+    },
+    {
+      "package": "matplotlib",
+      "version": "3.11.2",
+      "license": "License agreement for matplotlib versions 1.3.0 and later",
+      "status": "PASS"
+    },
+    {
+      "package": "requests",
+      "version": "2.34.2",
+      "license": "Apache-2.0",
+      "status": "PASS"
+    },
+    {
+      "package": "pydantic",
+      "version": "2.14.3",
+      "license": "MIT",
+      "status": "PASS"
+    }
+  ],
+  "datasets": [
+    {
+      "dataset": "Deterministic Synthetic Multi-CRS Satellite Scenes (6-band GeoTIFF)",
+      "license": "CC-BY-4.0 (generated locally, zero external download)",
+      "territorial_or_commercial_restrictions": "None",
+      "status": "PASS"
+    },
+    {
+      "dataset": "Deterministic Synthetic Weather Observations & GeoParquet Basins",
+      "license": "CC-BY-4.0 (generated locally, zero external download)",
+      "territorial_or_commercial_restrictions": "None",
+      "status": "PASS"
+    },
+    {
+      "dataset": "Pretrained ML Model Weights",
+      "license": "None used (100% deterministic scientific & statistical geospatial computation)",
+      "territorial_or_commercial_restrictions": "N/A",
+      "status": "PASS"
+    }
+  ]
+}

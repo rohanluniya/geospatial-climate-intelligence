@@ -1,0 +1,23 @@
+# Python & virtualenv
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# Tool caches & Hypothesis state
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# Local runtime state, secrets, logs
+.env
+.local_data/
+*.log
+*.pid
+.DS_Store
+Thumbs.db

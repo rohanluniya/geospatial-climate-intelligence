@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Geospatial &amp; Climate Intelligence Control Tower</title>
+  <style>
+    :root {
+      --bg: #070d19;
+      --bg-panel: #0f172a;
+      --bg-card: #141f35;
+      --bg-elev: #1b2a47;
+      --border: #243554;
+      --text: #e2e8f0;
+      --muted: #94a3b8;
+      --cyan: #38bdf8;
+      --emerald: #34d399;
+      --amber: #fbbf24;
+      --rose: #fb7185;
+      --indigo: #818cf8;
+      --violet: #a78bfa;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--sans);
+      background: radial-gradient(circle at 12% 8%, #10203e 0%, var(--bg) 52%);
+      color: var(--text);
+      line-height: 1.45;
+      min-height: 100vh;
+    }
+    .shell {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 14px 20px 36px;
+    }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 18px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.96), rgba(20, 31, 53, 0.92));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+    .brand h1 {
+      font-size: 1.28rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #f8fafc;
+    }
+    .brand p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .header-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      align-items: center;
+    }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--text);
+      font-family: var(--mono);
+    }
+    .pill.live { border-color: rgba(52, 211, 153, 0.45); color: var(--emerald); }
+    .pill.snap { border-color: rgba(56, 189, 248, 0.4); color: var(--cyan); }
+    .pill.warn { border-color: rgba(251, 191, 36, 0.45); color: var(--amber); }
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--emerald);
+      box-shadow: 0 0 8px var(--emerald);
+    }
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .kpi {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 13px;
+    }
+    .kpi-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+    }
+    .kpi-value {
+      font-size: 1.42rem;
+      font-weight: 700;
+      margin-top: 3px;
+      font-family: var(--mono);
+      color: #f8fafc;
+    }
+    .kpi-sub {
+      font-size: 0.71rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1.05fr 0.95fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      min-width: 0;
+    }
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .panel-title {
+      font-size: 0.94rem;
+      font-weight: 700;
+      color: #f8fafc;
+    }
+    .panel-subtitle {
+      font-size: 0.73rem;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+    .region-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .tab-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 5px 10px;
+      border-radius: 7px;
+      cursor: pointer;
+      font-size: 0.74rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover { border-color: var(--cyan); color: var(--text); }
+    .tab-btn.active {
+      background: rgba(56, 189, 248, 0.16);
+      border-color: var(--cyan);
+      color: #f8fafc;
+    }
+    .tile-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .tile-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .tile-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.73rem;
+      font-weight: 600;
+    }
+    .tile-img-wrap {
+      position: relative;
+      background: #0b1220;
+      height: 156px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .tile-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .colorbar {
+      height: 6px;
+      width: 100%;
+    }
+    .cb-ndvi { background: linear-gradient(90deg, #a50026, #f46d43, #fee08b, #66bd63, #006837); }
+    .cb-lst  { background: linear-gradient(90deg, #000004, #57106e, #bb3754, #f98e09, #fcffa4); }
+    .cb-flood { background: linear-gradient(90deg, #ffffd9, #7fcdbb, #1d91c0, #0c2c84); }
+    .cb-qa   { background: linear-gradient(90deg, #22c55e 0%, #22c55e 65%, #f43f5e 65%, #f43f5e 100%); }
+    .tile-meta {
+      padding: 6px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px;
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-family: var(--mono);
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-size: 0.66rem;
+      font-weight: 700;
+      font-family: var(--mono);
+      white-space: nowrap;
+    }
+    .tag-ok { background: rgba(52, 211, 153, 0.16); color: var(--emerald); border: 1px solid rgba(52, 211, 153, 0.35); }
+    .tag-warn { background: rgba(251, 191, 36, 0.16); color: var(--amber); border: 1px solid rgba(251, 191, 36, 0.35); }
+    .tag-alert { background: rgba(251, 113, 133, 0.18); color: var(--rose); border: 1px solid rgba(251, 113, 133, 0.4); }
+    .tag-info { background: rgba(56, 189, 248, 0.16); color: var(--cyan); border: 1px solid rgba(56, 189, 248, 0.35); }
+    .tag-purple { background: rgba(167, 139, 250, 0.16); color: var(--violet); border: 1px solid rgba(167, 139, 250, 0.35); }
+    .stack-col { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+    .table-wrap { overflow-x: auto; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.72rem;
+    }
+    th {
+      text-align: left;
+      padding: 6px 7px;
+      color: var(--muted);
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    td {
+      padding: 6px 7px;
+      border-bottom: 1px solid rgba(36, 53, 84, 0.55);
+      vertical-align: top;
+      word-break: break-word;
+    }
+    tr:hover td { background: rgba(27, 42, 71, 0.45); }
+    .mono { font-family: var(--mono); }
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .caveat-box {
+      font-size: 0.71rem;
+      color: var(--muted);
+      background: rgba(20, 31, 53, 0.8);
+      border-left: 3px solid var(--amber);
+      padding: 8px 10px;
+      border-radius: 0 8px 8px 0;
+      margin-top: 10px;
+    }
+    @media (max-width: 1180px) {
+      .kpi-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .main-grid, .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <div class="brand">
+        <h1>Planet-Scale Geospatial &amp; Climate Intelligence Engine</h1>
+        <p>STAC 1.1 Asset Catalog · Multi-CRS GeoTIFF/COG · GeoParquet · xarray/Dask Cube · Apache Iceberg V2 · Reproducible PNG Tile Server</p>
+      </div>
+      <div class="header-badges">
+        <span class="pill live"><span class="dot"></span>LIVE · 127.0.0.1:8070</span>
+        <span class="pill snap" id="badge-stac-snap">STAC SNAPSHOT: ...</span>
+        <span class="pill snap" id="badge-dq">DQ: ...</span>
+        <span class="pill warn" id="badge-freshness">FRESHNESS: ...</span>
+      </div>
+    </header>
+
+    <section class="kpi-grid" id="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Regions &amp; CRSs</div><div class="kpi-value" id="kpi-regions">-</div><div class="kpi-sub">EPSG:32610, 4326, 3413 + 180°</div></div>
+      <div class="kpi"><div class="kpi-label">Validated STAC Scenes</div><div class="kpi-value" id="kpi-scenes">-</div><div class="kpi-sub">SHA-256 verified · CC-BY-4.0</div></div>
+      <div class="kpi"><div class="kpi-label">Zonal Basin Records</div><div class="kpi-value" id="kpi-zonal">-</div><div class="kpi-sub">GeoParquet × xarray/Dask</div></div>
+      <div class="kpi"><div class="kpi-label">Deseasonalized Anomalies</div><div class="kpi-value" id="kpi-anomalies">-</div><div class="kpi-sub" id="kpi-fp-sub">Naive seasonal FPs suppressed</div></div>
+      <div class="kpi"><div class="kpi-label">Quarantine DLQ</div><div class="kpi-value" id="kpi-dlq">-</div><div class="kpi-sub">Corrupt GeoTIFF + bad weather</div></div>
+      <div class="kpi"><div class="kpi-label">Tile Cache Hit Rate</div><div class="kpi-value" id="kpi-tile-hit">-</div><div class="kpi-sub" id="kpi-tile-sub">Content-hashed PNG ETag</div></div>
+    </section>
+
+    <section class="main-grid">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Live Reproducible Map Tile Viewer (Real RGBA PNG Tiles)</div>
+            <div class="panel-subtitle">Served via <code>/v1/tiles/{layer}/{z}/{x}/{y}.png</code> directly from cloud-free xarray/Dask composite mosaics with provenance headers</div>
+          </div>
+          <span class="tag tag-info" id="active-crs-badge">EPSG:32610 → EPSG:4326</span>
+        </div>
+        <div class="region-tabs" id="region-tabs"></div>
+        <div class="tile-grid" id="tile-grid"></div>
+        <div class="caveat-box" id="mosaic-note">
+          <strong>Scientific &amp; Coverage Provenance:</strong> Loading cloud-free composite metadata...
+        </div>
+      </div>
+
+      <div class="stack-col">
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Deseasonalized Anomaly Detection vs Naive Delta</div>
+              <div class="panel-subtitle">Harmonic seasonal baseline removes summer/winter confounding</div>
+            </div>
+            <span class="tag tag-purple">|z| ≥ 2.0</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Region / Basin</th>
+                  <th>Date</th>
+                  <th>LST °C (Exp)</th>
+                  <th>Naive Δ</th>
+                  <th>Z-LST / Z-NDVI</th>
+                  <th>Classification</th>
+                </tr>
+              </thead>
+              <tbody id="anomalies-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <div>
+              <div class="panel-title">Regional Lakehouse Rollup (DuckDB over Iceberg V2)</div>
+              <div class="panel-subtitle">Multi-CRS harmonized basins with valid pixel coverage</div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Region</th>
+                  <th>NDVI</th>
+                  <th>NDWI</th>
+                  <th>LST °C</th>
+                  <th>Valid Px</th>
+                  <th>Anom / FP Suppr.</th>
+                </tr>
+              </thead>
+              <tbody id="region-summary-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="two-col">
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">STAC 1.1 Asset Catalog Browser (Bronze Iceberg)</div>
+            <div class="panel-subtitle">Immutable SHA-256 verified GeoTIFF scenes across mixed CRSs &amp; antimeridian</div>
+          </div>
+          <span class="tag tag-ok" id="stac-count-badge">0 items</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Scene ID</th>
+                <th>CRS / Flags</th>
+                <th>Cloud %</th>
+                <th>Nodata %</th>
+                <th>SHA-256</th>
+                <th>Ver</th>
+              </tr>
+            </thead>
+            <tbody id="stac-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <div>
+            <div class="panel-title">Data Quality Suite, Quarantine DLQ &amp; Iceberg V2 Tables</div>
+            <div class="panel-subtitle">Automated checks, auditable defect isolation, and snapshot versions</div>
+          </div>
+        </div>
+        <div class="table-wrap" style="margin-bottom: 14px;">
+          <table>
+            <thead>
+              <tr><th>DQ Check</th><th>Layer</th><th>Status</th><th>Observed</th></tr>
+            </thead>
+            <tbody id="dq-body"></tbody>
+          </table>
+        </div>
+        <div class="panel-subtitle" style="margin-bottom: 6px; font-weight: 600; color: var(--amber);">Quarantine DLQ Records (Corrupt GeoTIFF &amp; Invalid Weather)</div>
+        <div class="table-wrap" style="margin-bottom: 14px;">
+          <table>
+            <thead>
+              <tr><th>Record ID</th><th>Source</th><th>Reason Code</th><th>Detail</th></tr>
+            </thead>
+            <tbody id="dlq-body"></tbody>
+          </table>
+        </div>
+        <div class="panel-subtitle" style="margin-bottom: 6px; font-weight: 600; color: var(--cyan);">Apache Iceberg V2 Lakehouse Inventory</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Iceberg Table</th><th>Snapshots</th><th>Files</th><th>Rows</th></tr>
+            </thead>
+            <tbody id="iceberg-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-head">
+        <div>
+          <div class="panel-title">Zonal Climate Statistics (GeoParquet Basins × Masked xarray/Dask Cube)</div>
+          <div class="panel-subtitle">Explicit percentiles (p10/p50/p90), 95% confidence half-widths, valid pixel fraction, ground station fusion, and scientific caveats</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Basin</th>
+              <th>Date</th>
+              <th>NDVI Mean (±CI)</th>
+              <th>p10 / p50 / p90</th>
+              <th>Flood %</th>
+              <th>LST °C (2m Air)</th>
+              <th>Valid Px %</th>
+              <th>Quality</th>
+              <th>Scientific Caveat</th>
+            </tr>
+          </thead>
+          <tbody id="zonal-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const DEV_VIEWER_KEY = "dev-viewer-token-geo08";
+    const HEADERS = { "X-API-Key": DEV_VIEWER_KEY };
+    const LAYERS = [
+      { id: "ndvi",  label: "NDVI Vegetation", cb: "cb-ndvi",  scale: "-0.2 → +0.9" },
+      { id: "lst",   label: "Surface Temp (LST)", cb: "cb-lst",   scale: "-10° → +48°C" },
+      { id: "flood", label: "Flood Proxy (NDWI)", cb: "cb-flood", scale: "-0.3 → +0.65" },
+      { id: "qa",    label: "QA Cloud Mask", cb: "cb-qa",    scale: "Clear / Masked" },
+    ];
+
+    let overviewData = null;
+    let activeRegion = "california_central_valley";
+    const objectUrls = [];
+
+    async function apiJson(url) {
+      const res = await fetch(url, { headers: HEADERS });
+      if (!res.ok) throw new Error(`HTTP ${res.status} on ${url}`);
+      return res.json();
+    }
+
+    async function loadTilesForRegion(regionId) {
+      activeRegion = regionId;
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.region === regionId);
+      });
+
+      const regionInfo = (overviewData?.regions || []).find(r => r.region_id === regionId);
+      if (regionInfo) {
+        let extra = "";
+        if (regionInfo.antimeridian_crossing) extra = " · 180° Antimeridian Split";
+        if (regionInfo.polar_region) extra = " · Polar Stereographic";
+        document.getElementById("active-crs-badge").textContent =
+          `EPSG:${regionInfo.source_epsg} → EPSG:${regionInfo.canonical_epsg}${extra}`;
+      }
+
+      const mosaicInfo = (overviewData?.mosaics || []).find(m => m.region_id === regionId);
+      if (mosaicInfo) {
+        document.getElementById("mosaic-note").innerHTML =
+          `<strong>Cloud-Free Mosaic Provenance (${regionId}):</strong> Composited <b>${mosaicInfo.scenes_composited}</b> scenes via Dask median; ` +
+          `single-scene worst valid coverage <b>${mosaicInfo.single_scene_min_valid_pct}%</b> → mosaic recovered <b>${mosaicInfo.valid_pixel_pct}%</b> valid pixels. ` +
+          `Caveat: synthetic reflectance &amp; thermal skin temperature omit atmospheric aerosol scattering.`;
+      }
+
+      while (objectUrls.length) URL.revokeObjectURL(objectUrls.pop());
+      const grid = document.getElementById("tile-grid");
+      grid.innerHTML = "";
+
+      for (const layer of LAYERS) {
+        const card = document.createElement("div");
+        card.className = "tile-card";
+        card.innerHTML = `
+          <div class="tile-top">
+            <span>${layer.label}</span>
+            <span class="mono" style="color: var(--muted);">${layer.scale}</span>
+          </div>
+          <div class="tile-img-wrap"><span class="mono" style="color: var(--muted);">Rendering PNG...</span></div>
+          <div class="colorbar ${layer.cb}"></div>
+          <div class="tile-meta"><span>Loading headers...</span></div>
+        `;
+        grid.appendChild(card);
+
+        const url = `/v1/tiles/${layer.id}/0/0/0.png?region_id=${encodeURIComponent(regionId)}`;
+        const resp = await fetch(url, { headers: HEADERS });
+        const blob = await resp.blob();
+        const imgUrl = URL.createObjectURL(blob);
+        objectUrls.push(imgUrl);
+
+        const cacheStatus = resp.headers.get("X-Cache-Status") || "MISS";
+        const validPct = resp.headers.get("X-Valid-Pixel-Pct") || "-";
+        const crs = resp.headers.get("X-CRS") || "EPSG:4326";
+        const etag = (resp.headers.get("ETag") || "").replace(/"/g, "").slice(0, 10);
+        const renderMs = resp.headers.get("X-Render-Ms") || "-";
+        const snap = (resp.headers.get("X-STAC-Snapshot") || "").slice(-8);
+
+        card.querySelector(".tile-img-wrap").innerHTML =
+          `<img src="${imgUrl}" alt="${regionId} ${layer.id} map tile" />`;
+        card.querySelector(".tile-meta").innerHTML = `
+          <span>${crs} · Valid ${validPct}% · ${renderMs}ms</span>
+          <span class="tag ${cacheStatus === "HIT" ? "tag-ok" : "tag-info"}">${cacheStatus} · #${etag} · s:${snap}</span>
+        `;
+      }
+
+      // Refresh live tile cache KPI after rendering tiles
+      const tileStats = await apiJson("/v1/tiles/stats");
+      const ls = tileStats.live_stats;
+      document.getElementById("kpi-tile-hit").textContent = `${ls.hit_rate_pct}%`;
+      document.getElementById("kpi-tile-sub").textContent = `${ls.cache_hits} hits / ${ls.total_requests} reqs`;
+    }
+
+    function renderOverview(data) {
+      overviewData = data;
+      const k = data.kpis;
+      document.getElementById("kpi-regions").textContent = k.regions_monitored;
+      document.getElementById("kpi-scenes").textContent = k.stac_validated_scenes;
+      document.getElementById("kpi-zonal").textContent = k.zonal_stats_rows;
+      document.getElementById("kpi-anomalies").textContent = k.flagged_anomalies;
+      document.getElementById("kpi-fp-sub").textContent = `${k.seasonal_fp_suppressed} naive seasonal FPs suppressed`;
+      document.getElementById("kpi-dlq").textContent = k.quarantined_dlq_records;
+      document.getElementById("kpi-tile-hit").textContent = `${data.tile_cache.hit_rate_pct}%`;
+      document.getElementById("kpi-tile-sub").textContent = `${data.tile_cache.cache_hits} hits / ${data.tile_cache.total_requests} reqs`;
+
+      document.getElementById("badge-stac-snap").textContent = `STAC SNAP: ${String(data.stac_snapshot_id).slice(-10)}`;
+      document.getElementById("badge-dq").textContent = `DQ: ${k.dq_checks_passed}/${k.dq_checks_total} PASS`;
+      document.getElementById("badge-freshness").textContent = `FRESH: ${(data.freshness_utc || "").slice(0, 19)}Z`;
+
+      const tabsEl = document.getElementById("region-tabs");
+      tabsEl.innerHTML = "";
+      for (const r of data.regions) {
+        const btn = document.createElement("button");
+        btn.className = `tab-btn ${r.region_id === activeRegion ? "active" : ""}`;
+        btn.dataset.region = r.region_id;
+        btn.textContent = r.display_name.split(" (")[0];
+        btn.onclick = () => loadTilesForRegion(r.region_id);
+        tabsEl.appendChild(btn);
+      }
+
+      const rsBody = document.getElementById("region-summary-body");
+      rsBody.innerHTML = data.region_summary.map(r => `
+        <tr>
+          <td class="mono">${r.region_id}</td>
+          <td class="mono">${r.avg_ndvi}</td>
+          <td class="mono">${r.avg_ndwi}</td>
+          <td class="mono">${r.avg_lst_c}°C</td>
+          <td class="mono">${r.avg_valid_pixel_pct}%</td>
+          <td class="mono"><span class="tag tag-alert">${r.anomaly_events}</span> / <span class="tag tag-ok">${r.seasonal_fp_suppressed}</span></td>
+        </tr>
+      `).join("");
+
+      const iceBody = document.getElementById("iceberg-body");
+      iceBody.innerHTML = data.iceberg_tables.map(t => `
+        <tr>
+          <td class="mono">${t.table}</td>
+          <td class="mono">${t.snapshot_count}</td>
+          <td class="mono">${t.data_files}</td>
+          <td class="mono">${t.row_count}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderAnomalies(data) {
+      const flagged = data.rows.filter(a => a.anomaly_type !== "NORMAL").slice(0, 5);
+      const blocked = data.rows.filter(a => a.naive_seasonal_confounding_fp).slice(0, 3);
+      const rows = [...flagged, ...blocked];
+      document.getElementById("anomalies-body").innerHTML = rows.map(a => {
+        const isAnom = a.anomaly_type !== "NORMAL";
+        const clsTag = isAnom
+          ? `<span class="tag tag-alert">${a.anomaly_type}</span>`
+          : a.naive_seasonal_confounding_fp
+            ? `<span class="tag tag-ok">NORMAL (FP Blocked)</span>`
+            : `<span class="tag tag-info">NORMAL</span>`;
+        const naiveDelta = `${a.naive_raw_delta_lst_c >= 0 ? "+" : ""}${a.naive_raw_delta_lst_c}°C`;
+        return `
+          <tr>
+            <td><div class="mono" style="font-size:0.69rem;">${a.basin_id.replace("__", " / ")}</div></td>
+            <td class="mono">${a.acquisition_date}</td>
+            <td class="mono">${a.observed_lst_c}° <span style="color:var(--muted);">(${a.expected_seasonal_lst_c}°)</span></td>
+            <td class="mono" style="color:${a.naive_seasonal_confounding_fp ? "var(--amber)" : "var(--muted)"};">${naiveDelta}</td>
+            <td class="mono">${a.deseasonalized_z_lst} / ${a.deseasonalized_z_ndvi}</td>
+            <td>${clsTag}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderStac(data) {
+      document.getElementById("stac-count-badge").textContent = `${data.count} items`;
+      document.getElementById("stac-body").innerHTML = data.items.slice(0, 12).map(it => {
+        const flags = [];
+        flags.push(`<span class="tag tag-info">EPSG:${it.source_epsg}</span>`);
+        if (it.antimeridian_crossing) flags.push(`<span class="tag tag-purple">180°</span>`);
+        if (it.polar_region) flags.push(`<span class="tag tag-purple">POLAR</span>`);
+        const cloudTag = it.cloud_cover_pct > 50 ? "tag-alert" : it.cloud_cover_pct > 20 ? "tag-warn" : "tag-ok";
+        return `
+          <tr>
+            <td class="mono" style="font-size:0.68rem;">${it.scene_id}</td>
+            <td>${flags.join(" ")}</td>
+            <td class="mono"><span class="tag ${cloudTag}">${it.cloud_cover_pct}%</span></td>
+            <td class="mono">${it.nodata_pct}%</td>
+            <td class="mono" style="color:var(--muted);">${it.sha256.slice(0, 8)}…</td>
+            <td class="mono">v${it.scene_version}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderDq(data) {
+      document.getElementById("dq-body").innerHTML = data.checks.map(c => `
+        <tr>
+          <td class="mono">${c.check_name}</td>
+          <td class="mono">${c.layer}</td>
+          <td><span class="tag ${c.passed ? "tag-ok" : "tag-alert"}">${c.passed ? "PASS" : "FAIL"}</span></td>
+          <td class="mono">${c.observed_value}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("dlq-body").innerHTML = data.quarantine_records.map(q => `
+        <tr>
+          <td class="mono" style="font-size:0.68rem;">${q.record_id.slice(0, 26)}${q.record_id.length > 26 ? "…" : ""}</td>
+          <td class="mono">${q.source_type === "stac_scene" ? "stac" : "weather"}</td>
+          <td><span class="tag tag-alert">${q.reason_code}</span></td>
+          <td style="color:var(--muted); font-size:0.68rem;">${q.detail.slice(0, 38)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderZonal(data) {
+      document.getElementById("zonal-body").innerHTML = data.rows.slice(0, 10).map(z => {
+        const qCls = z.quality_tier === "HIGH" ? "tag-ok" : z.quality_tier === "DEGRADED" ? "tag-warn" : "tag-alert";
+        const air = z.station_air_temp_c != null ? ` (${z.station_air_temp_c}°C)` : "";
+        return `
+          <tr>
+            <td class="mono">${z.basin_id.replace("__", " / ")}</td>
+            <td class="mono">${z.acquisition_date}</td>
+            <td class="mono">${z.ndvi_mean ?? "-"} ± ${z.ndvi_ci95_halfwidth ?? "-"}</td>
+            <td class="mono">${z.ndvi_p10 ?? "-"} / ${z.ndvi_p50 ?? "-"} / ${z.ndvi_p90 ?? "-"}</td>
+            <td class="mono">${z.flood_extent_pct ?? "-"}%</td>
+            <td class="mono">${z.lst_c_mean ?? "-"}°C<span style="color:var(--muted);">${air}</span></td>
+            <td class="mono">${z.valid_pixel_pct}%</td>
+            <td><span class="tag ${qCls}">${z.quality_tier}</span></td>
+            <td style="color:var(--muted); font-size:0.69rem; max-width:290px;">${z.scientific_caveat}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function boot() {
+      const [ov, anom, stac, dq, zonal] = await Promise.all([
+        apiJson("/v1/overview"),
+        apiJson("/v1/anomalies?limit=66"),
+        apiJson("/v1/stac/items"),
+        apiJson("/v1/dq"),
+        apiJson("/v1/zonal-stats?limit=30"),
+      ]);
+      renderOverview(ov);
+      renderAnomalies(anom);
+      renderStac(stac);
+      renderDq(dq);
+      renderZonal(zonal);
+      await loadTilesForRegion(activeRegion);
+      window.__CONTROL_TOWER_READY__ = true;
+    }
+
+    boot().catch(err => {
+      console.error("Control Tower boot failed:", err);
+      document.getElementById("mosaic-note").textContent = "Error loading live telemetry: " + err.message;
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+{
+  "title": "Geospatial & Climate Intelligence Engine — SLO Overview",
+  "uid": "geoclimate-overview-v1",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "panels": [
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "DQ Checks Passing",
+      "gridPos": {"h": 6, "w": 6, "x": 0, "y": 0},
+      "targets": [{"expr": "sum(geoclimate_dq_checks_status)"}]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Validated STAC Scenes",
+      "gridPos": {"h": 6, "w": 6, "x": 6, "y": 0},
+      "targets": [{"expr": "sum(geoclimate_scenes_ingested_total{status=\"validated\"})"}]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Quarantined DLQ Records",
+      "gridPos": {"h": 6, "w": 6, "x": 12, "y": 0},
+      "targets": [{"expr": "sum(geoclimate_quarantined_records_total)"}]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Tile Cache Hit Rate (%)",
+      "gridPos": {"h": 6, "w": 6, "x": 18, "y": 0},
+      "targets": [{"expr": "100 * sum(geoclimate_tile_requests_total{cache_status=\"HIT\"}) / clamp_min(sum(geoclimate_tile_requests_total), 1)"}]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Average Tile Render Latency (ms)",
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 6},
+      "targets": [{"expr": "geoclimate_tile_render_duration_ms_sum / clamp_min(geoclimate_tile_render_duration_ms_count, 1)"}]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "Auth Rejections (401/403)",
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 6},
+      "targets": [{"expr": "rate(geoclimate_auth_rejections_total[5m])"}]
+    }
+  ]
+}

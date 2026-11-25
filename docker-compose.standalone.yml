@@ -1,0 +1,31 @@
+services:
+  geo-climate-standalone:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.standalone
+    image: geospatial-climate-intelligence:0.1.0
+    container_name: geo-climate-standalone
+    ports:
+      - "8070:8070"
+    environment:
+      GEO_CLIMATE_DATA_DIR: /var/lib/geoclimate
+      GEO_CLIMATE_API_HOST: 0.0.0.0
+      GEO_CLIMATE_API_PORT: "8070"
+      GEO_CLIMATE_VIEWER_TOKEN: ${GEO_CLIMATE_VIEWER_TOKEN:-dev-viewer-token-geo08}
+      GEO_CLIMATE_ANALYST_TOKEN: ${GEO_CLIMATE_ANALYST_TOKEN:-dev-analyst-token-geo08}
+      GEO_CLIMATE_ADMIN_TOKEN: ${GEO_CLIMATE_ADMIN_TOKEN:-dev-admin-token-geo08}
+    volumes:
+      - geoclimate_standalone_data:/var/lib/geoclimate
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8070/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+
+volumes:
+  geoclimate_standalone_data:

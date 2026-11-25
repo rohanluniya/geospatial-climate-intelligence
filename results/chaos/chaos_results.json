@@ -1,0 +1,105 @@
+{
+  "generated_at_utc": "2026-11-25T06:11:47.883134+00:00",
+  "drills_passed": 8,
+  "drills_total": 8,
+  "drills": [
+    {
+      "drill_id": "drill_01_corrupt_geotiff_checksum_quarantine",
+      "title": "Corrupt GeoTIFF & SHA-256 mismatch quarantined to DLQ without blocking healthy scenes",
+      "passed": true,
+      "elapsed_ms": 635.49,
+      "metrics": {
+        "quarantined_corrupt_geotiffs": 1,
+        "total_dlq_records": 3,
+        "healthy_stac_scenes_preserved": 22
+      }
+    },
+    {
+      "drill_id": "drill_02_crs_mismatch_normalization",
+      "title": "Mixed EPSG:32610 (UTM), EPSG:3413 (Polar), and EPSG:4326 scenes normalized to canonical EPSG:4326",
+      "passed": true,
+      "elapsed_ms": 569.45,
+      "metrics": {
+        "source_epsg_codes": [
+          3413,
+          4326,
+          32610
+        ],
+        "canonical_epsg_codes": [
+          4326
+        ],
+        "max_crs_roundtrip_error_meters": 0.0
+      }
+    },
+    {
+      "drill_id": "drill_03_heavy_cloud_80pct_mask_and_mosaic_fallback",
+      "title": "Heavy tropical cloud scene masked cleanly and multi-date Dask median mosaic recovers >95% valid pixels",
+      "passed": true,
+      "elapsed_ms": 556.84,
+      "metrics": {
+        "single_scene_min_valid_pct": 18.73,
+        "mosaic_recovered_valid_pct": 100.0,
+        "min_amazon_heavy_cloud_zonal_lst_c": 23.8
+      }
+    },
+    {
+      "drill_id": "drill_04_antimeridian_and_polar_boundary_validity",
+      "title": "180-degree antimeridian Fiji MultiPolygons and 78N Svalbard Polar basins remain valid with zero seam loss",
+      "passed": true,
+      "elapsed_ms": 570.25,
+      "metrics": {
+        "geoparquet_version": "1.1.0",
+        "fiji_multipolygon_basins": 3,
+        "fiji_valid_zonal_records": 15,
+        "polar_valid_zonal_records": 15
+      }
+    },
+    {
+      "drill_id": "drill_05_partial_tile_failure_isolation",
+      "title": "Injected 2/9 tile I/O failures isolated cleanly while 7/9 sibling tiles compute bit-exact values",
+      "passed": true,
+      "elapsed_ms": 0.06,
+      "metrics": {
+        "total_tiles": 9,
+        "succeeded_tiles": 7,
+        "failed_tiles": 2,
+        "tile_success_pct": 77.78
+      }
+    },
+    {
+      "drill_id": "drill_06_incremental_backfill_replay_parity",
+      "title": "Idempotent incremental backfill produces exact zonal-value replay parity across Iceberg V2 snapshots",
+      "passed": true,
+      "elapsed_ms": 1645.83,
+      "metrics": {
+        "rows_before": 66,
+        "rows_after": 66,
+        "exact_value_parity": true,
+        "iceberg_snapshots_recorded": 3
+      }
+    },
+    {
+      "drill_id": "drill_07_tile_cache_invalidation_on_scene_version",
+      "title": "New scene calibration version (v2) invalidates stale v1 PNG tiles and issues fresh ETag & provenance headers",
+      "passed": true,
+      "elapsed_ms": 2195.97,
+      "metrics": {
+        "version_before": 1,
+        "version_after": 2,
+        "etag_changed": true,
+        "post_invalidation_second_req_status": "HIT"
+      }
+    },
+    {
+      "drill_id": "drill_08_service_restart_and_iceberg_recovery",
+      "title": "Cold service restart recovers all 9 Iceberg V2 tables, STAC catalog, and disk-backed PNG tile cache with zero data loss",
+      "passed": true,
+      "elapsed_ms": 1282.92,
+      "metrics": {
+        "zonal_rows_recovered": 66,
+        "stac_scenes_recovered": 22,
+        "tile_cache_status_after_restart": "HIT"
+      }
+    }
+  ]
+}

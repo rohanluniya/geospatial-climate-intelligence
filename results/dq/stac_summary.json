@@ -1,0 +1,56 @@
+{
+  "stac_summary": {
+    "catalog_id": "geospatial-climate-intelligence-stac",
+    "stac_version": "1.1.0",
+    "collections": 4,
+    "validated_items": 22,
+    "quarantined_items": 1,
+    "duplicates_skipped": 1,
+    "crs_epsg_codes": [
+      3413,
+      4326,
+      32610
+    ]
+  },
+  "weather_stats": {
+    "raw_count": 65,
+    "resolved_active_count": 59,
+    "quarantined_count": 2,
+    "duplicates_skipped": 1,
+    "corrections_applied": 1,
+    "retractions_applied": 1
+  },
+  "mosaics": [
+    {
+      "region_id": "amazon_tapajos_basin",
+      "window_label": "multi_date_cloud_free_median",
+      "scenes_composited": 6,
+      "valid_pixel_pct": 100.0,
+      "single_scene_min_valid_pct": 18.73
+    },
+    {
+      "region_id": "california_central_valley",
+      "window_label": "multi_date_cloud_free_median",
+      "scenes_composited": 6,
+      "valid_pixel_pct": 100.0,
+      "single_scene_min_valid_pct": 71.07
+    },
+    {
+      "region_id": "fiji_pacific_atoll",
+      "window_label": "multi_date_cloud_free_median",
+      "scenes_composited": 5,
+      "valid_pixel_pct": 100.0,
+      "single_scene_min_valid_pct": 86.12
+    },
+    {
+      "region_id": "svalbard_arctic_fjord",
+      "window_label": "multi_date_cloud_free_median",
+      "scenes_composited": 5,
+      "valid_pixel_pct": 100.0,
+      "single_scene_min_valid_pct": 75.18
+    }
+  ],
+  "zonal_stats_rows": 66,
+  "flagged_anomalies": 14,
+  "seasonal_confounding_fp_suppressed": 9
+}

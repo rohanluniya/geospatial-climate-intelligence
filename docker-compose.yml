@@ -1,0 +1,214 @@
+# Multi-profile Distributed Geospatial & Climate Intelligence Stack
+# Profiles: core | analytics | observability | full
+# Every container tag is strictly pinned to a verified release version.
+
+services:
+  geo-api:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.standalone
+    image: geospatial-climate-intelligence:0.1.0
+    profiles: ["core", "analytics", "observability", "full"]
+    ports:
+      - "8070:8070"
+    environment:
+      GEO_CLIMATE_DATA_DIR: /var/lib/geoclimate
+      GEO_CLIMATE_API_HOST: 0.0.0.0
+      GEO_CLIMATE_API_PORT: "8070"
+      GEO_CLIMATE_VIEWER_TOKEN: ${GEO_CLIMATE_VIEWER_TOKEN:-dev-viewer-token-geo08}
+      GEO_CLIMATE_ANALYST_TOKEN: ${GEO_CLIMATE_ANALYST_TOKEN:-dev-analyst-token-geo08}
+      GEO_CLIMATE_ADMIN_TOKEN: ${GEO_CLIMATE_ADMIN_TOKEN:-dev-admin-token-geo08}
+    volumes:
+      - geoclimate_data:/var/lib/geoclimate
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8070/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+
+  rustfs:
+    image: rustfs/rustfs:1.0.6
+    profiles: ["core", "analytics", "full"]
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      RUSTFS_ACCESS_KEY: ${RUSTFS_ACCESS_KEY:-dev-rustfs-access}
+      RUSTFS_SECRET_KEY: ${RUSTFS_SECRET_KEY:-dev-rustfs-secret-change-me}
+    volumes:
+      - rustfs_data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  postgis:
+    image: imresamu/postgis:17-3.6.1-alpine3.23
+    profiles: ["core", "analytics", "full"]
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGIS_USER:-geoclimate}
+      POSTGRES_PASSWORD: ${POSTGIS_PASSWORD:-dev-postgis-change-me}
+      POSTGRES_DB: ${POSTGIS_DB:-geoclimate}
+    volumes:
+      - postgis_data:/var/lib/postgresql/data
+      - ./sql/postgis/basin_spatial_indexes.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGIS_USER:-geoclimate} -d ${POSTGIS_DB:-geoclimate}"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  lakekeeper:
+    image: quay.io/lakekeeper/catalog:v0.15.1
+    profiles: ["core", "analytics", "full"]
+    depends_on:
+      postgis:
+        condition: service_healthy
+    ports:
+      - "8181:8181"
+    environment:
+      LAKEKEEPER__PG_DATABASE_URL_READ: postgresql://${POSTGIS_USER:-geoclimate}:${POSTGIS_PASSWORD:-dev-postgis-change-me}@postgis:5432/${POSTGIS_DB:-geoclimate}
+      LAKEKEEPER__PG_DATABASE_URL_WRITE: postgresql://${POSTGIS_USER:-geoclimate}:${POSTGIS_PASSWORD:-dev-postgis-change-me}@postgis:5432/${POSTGIS_DB:-geoclimate}
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 2G
+
+  spark-master:
+    image: apache/spark:4.1.4-scala2.13-java17-python3-ubuntu
+    profiles: ["analytics", "full"]
+    command: ["/opt/spark/bin/spark-class", "org.apache.spark.deploy.master.Master"]
+    ports:
+      - "7077:7077"
+      - "8081:8080"
+    volumes:
+      - ./processing/spark:/opt/spark/jobs:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+
+  sedona:
+    image: apache/sedona:1.9.1
+    profiles: ["analytics", "full"]
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./processing/spark:/opt/sedona/jobs:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+
+  trino:
+    image: trinodb/trino:484
+    profiles: ["analytics", "full"]
+    ports:
+      - "8085:8080"
+    volumes:
+      - ./sql/trino:/etc/trino/queries:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "4.0"
+          memory: 4G
+
+  airflow:
+    image: apache/airflow:slim-3.4.0-python3.12
+    profiles: ["analytics", "full"]
+    command: ["standalone"]
+    ports:
+      - "8086:8080"
+    volumes:
+      - ./processing/airflow/dags:/opt/airflow/dags:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: 3G
+
+  prometheus:
+    image: prom/prometheus:v3.16.0
+    profiles: ["observability", "full"]
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./infra/observability/alerts.yml:/etc/prometheus/alerts.yml:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  grafana:
+    image: grafana/grafana:13.0.14
+    profiles: ["observability", "full"]
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./infra/observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  loki:
+    image: grafana/loki:3.6.22
+    profiles: ["observability", "full"]
+    ports:
+      - "3100:3100"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.166.0-${OTEL_ARCH:-arm64}
+    profiles: ["observability", "full"]
+    command: ["--config=/etc/otelcol/config.yaml"]
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    volumes:
+      - ./infra/observability/otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+  marquez:
+    image: marquezproject/marquez:0.51.1
+    platform: linux/amd64
+    profiles: ["observability", "full"]
+    ports:
+      - "5000:5000"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+
+volumes:
+  geoclimate_data:
+  rustfs_data:
+  postgis_data:

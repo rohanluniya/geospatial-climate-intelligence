@@ -1,0 +1,43 @@
+name: Geospatial & Climate Intelligence CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  fast-pr-checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: uv sync --python 3.12 --extra dev
+      - name: Lint with Ruff
+        run: uv run ruff check .
+      - name: Type-check with Mypy
+        run: uv run mypy geo_climate ingestion processing models services
+      - name: Static security & pinned-tag audit
+        run: uv run python scripts/static_audit.py
+      - name: License & SBOM check
+        run: |
+          uv run python scripts/check_licenses.py
+          uv run python scripts/generate_sbom.py
+      - name: Fast Unit, Contract & Integration Tests
+        run: uv run pytest tests/unit tests/contracts tests/integration
+
+  e2e-and-chaos:
+    runs-on: ubuntu-24.04
+    needs: fast-pr-checks
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: uv sync --python 3.12 --extra dev
+      - name: End-to-End, Performance Smoke & Chaos Drills
+        run: uv run pytest tests/e2e tests/performance tests/chaos
