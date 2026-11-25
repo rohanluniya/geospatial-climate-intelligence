@@ -55,7 +55,7 @@ No pretrained ML weights are downloaded or served; all computations are determin
 ### Option 1: Zero-Docker Native Python 3.12 (Recommended for macOS ARM64 & Linux)
 
 ```bash
-git clone https://github.com/ankdeshm/geospatial-climate-intelligence.git
+git clone https://github.com/rohanluniya/geospatial-climate-intelligence.git
 cd geospatial-climate-intelligence
 
 # One-command setup, Bronze->Silver->Gold pipeline run, and live API + Control Tower on :8070
